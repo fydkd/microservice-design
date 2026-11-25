@@ -1,0 +1,33 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: notification-service
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/notification_management?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:changeme}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 1
+
+notification:
+  clients:
+    user-service-url: http://127.0.0.1:8081
+  features:
+    sms-enabled: true
+    email-enabled: true
+    site-message-enabled: true
+
+management:
+  health:
+    mail:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info

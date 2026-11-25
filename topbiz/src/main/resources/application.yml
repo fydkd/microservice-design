@@ -1,0 +1,39 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: topbiz
+  main:
+    allow-circular-references: true
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+
+topbiz:
+  session:
+    ttl: 12h
+  flow:
+    register-code: register-default
+    cancel-code: cancel-default
+  clients:
+    user-service-url: http://127.0.0.1:8081
+    notification-service-url: http://127.0.0.1:8082
+    log-service-url: http://127.0.0.1:8083
+  oauth:
+    feishu:
+      enabled: true
+      app-id: ${FEISHU_APP_ID:changeme}
+      app-secret: ${FEISHU_APP_SECRET:changeme}
+      authorize-url: https://accounts.feishu.cn/open-apis/authen/v1/authorize
+      app-access-token-url: https://open.feishu.cn/open-apis/auth/v3/app_access_token/internal
+      user-access-token-url: https://open.feishu.cn/open-apis/authen/v1/access_token
+      user-info-url: https://open.feishu.cn/open-apis/authen/v1/user_info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

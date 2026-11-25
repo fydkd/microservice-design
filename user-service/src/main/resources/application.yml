@@ -1,0 +1,31 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/user_management?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:changeme}
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+user-service:
+  features:
+    password-login-enabled: true
+    code-login-enabled: true
+    oauth-login-enabled: true
+    register-enabled: true
+    password-max-attempts: 5
+    password-lock-minutes: 15
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

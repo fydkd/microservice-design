@@ -1,0 +1,48 @@
+data_dir = "C:/Users/11605/Desktop/user_management/run-logs/vector-data"
+
+[sources.microservice_access_logs]
+type = "file"
+include = [
+  "C:/Users/11605/Desktop/user_management/run-logs/access/*-access.jsonl",
+  "C:/Users/11605/Desktop/user_management/*/run-logs/access/*-access.jsonl",
+]
+read_from = "beginning"
+fingerprint.strategy = "device_and_inode"
+
+[transforms.parse_and_clean]
+type = "remap"
+inputs = ["microservice_access_logs"]
+source = '''
+. = parse_json!(.message)
+
+if exists(.api_endpoint) && includes(["/actuator/health", "/actuator/info", "/metrics"], .api_endpoint) {
+  abort
+}
+
+if !exists(.user_id) {
+  .user_id = ""
+}
+
+if !exists(.trace_id) || .trace_id == "" {
+  .trace_id = uuid_v4()
+}
+
+if exists(.timestamp) {
+  parsed_timestamp = parse_timestamp!(.timestamp, format: "%+")
+  .timestamp = format_timestamp!(parsed_timestamp, format: "%F %T%.3f")
+}
+'''
+
+[sinks.clickhouse]
+type = "clickhouse"
+inputs = ["parse_and_clean"]
+endpoint = "http://127.0.0.1:8123"
+database = "logs"
+table = "access_log_all"
+compression = "gzip"
+skip_unknown_fields = true
+healthcheck.enabled = false
+
+[sinks.clickhouse.batch]
+max_events = 10000
+timeout_secs = 5

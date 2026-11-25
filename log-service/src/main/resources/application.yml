@@ -1,0 +1,36 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: log-service
+
+log-service:
+  table-name: logs.access_log_all
+  mock-enabled: false
+  max-query-range-days: 31
+  default-page-size: 20
+  max-page-size: 200
+  default-timeout-threshold-ms: 3000
+  clickhouse:
+    enabled: true
+    url: jdbc:clickhouse://192.168.117.25:8123/default?compress=0
+    username: ${CLICKHOUSE_USERNAME:default}
+    password: ${CLICKHOUSE_PASSWORD:changeme}
+    driver-class-name: com.clickhouse.jdbc.ClickHouseDriver
+  alert:
+    enabled: true
+    jdbc-url: jdbc:mysql://127.0.0.1:3306/log_management?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:changeme}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    evaluation-delay-ms: 60000
+    notification-service-url: http://127.0.0.1:8082
+    notification-cooldown-minutes: 5
+    default-notification-channel: in_app
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

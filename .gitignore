@@ -1,0 +1,34 @@
+target/
+**/target/
+.idea/
+*.iml
+*.log
+run-logs/
+**/run-logs/
+.mvn/
+.vscode/
+
+# Local artifacts and downloaded runtimes
+installers/
+dump.rdb
+*.rdb
+*.zip
+*.tgz
+*.msi
+
+# Documents are intentionally kept out of the code repository.
+*.md
+*.docx
+*.pdf
+*.pptx
+*.xlsx
+*.xls
+.tmp_msg_doc*
+
+# Local database export backups; curated init scripts stay tracked.
+sql/*_dump*.sql
+sql/*_split_*.sql
+sql/*_before_split_*.sql
+
+# Local temp files
+tmp_policy_recipients.json

@@ -1,0 +1,37 @@
+flowCode: register-default
+version: 1
+nodes:
+  - id: start
+    type: start
+  - id: check_account
+    type: condition
+    condition: account_not_registered
+  - id: verify_captcha
+    type: action
+    action: verify_register_captcha
+  - id: register_user
+    type: action
+    action: register_user
+  - id: create_session
+    type: action
+    action: create_session
+  - id: reject_duplicate
+    type: action
+    action: reject_account_exists
+  - id: end_success
+    type: end
+transitions:
+  - from: start
+    to: check_account
+  - from: check_account
+    on: true
+    to: verify_captcha
+  - from: check_account
+    on: false
+    to: reject_duplicate
+  - from: verify_captcha
+    to: register_user
+  - from: register_user
+    to: create_session
+  - from: create_session
+    to: end_success

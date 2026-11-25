@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理系统</title>
+    <link rel="stylesheet" href="./styles.css?v=20260628d">
+</head>
+<body>
+    <div class="background-shape shape-a"></div>
+    <div class="background-shape shape-b"></div>
+
+    <div id="authApp" class="auth-app">
+        <section class="auth-brand">
+            <p class="eyebrow">Topbiz Gateway</p>
+            <h1>用户管理系统</h1>
+            <p class="auth-intro">统一账号、组织权限、设备会话、流程编排和消息中心都通过 <code>topbiz</code> 接入。</p>
+            <div class="auth-feature-list">
+                <article>
+                    <strong>统一登录</strong>
+                    <span>手机号和邮箱共用同一个账号输入框。</span>
+                </article>
+                <article>
+                    <strong>个人中心</strong>
+                    <span>支持资料维护、密码修改、设备会话和站内消息查看。</span>
+                </article>
+                <article>
+                    <strong>流程与组织</strong>
+                    <span>支持组织字段、用户字段、权限菜单和注册流程预览。</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="auth-panel card">
+            <div class="auth-header">
+                <div>
+                    <p class="eyebrow">Access</p>
+                    <h2 id="authTitle">登录系统</h2>
+                </div>
+            </div>
+
+            <div id="authFeedback" class="auth-feedback hidden"></div>
+
+            <div id="loginMethodSelector" class="login-method-grid">
+                <button class="login-method-card" data-method="phone-password">
+                    <span class="method-icon"></span>
+                    <strong>手机号登录</strong>
+                    <small>使用手机号 + 密码登录</small>
+                </button>
+                <button class="login-method-card" data-method="email-code">
+                    <span class="method-icon"></span>
+                    <strong>邮箱验证码</strong>
+                    <small>使用邮箱 + 验证码快速登录</small>
+                </button>
+                <button class="login-method-card" data-method="feishu">
+                    <span class="method-icon"></span>
+                    <strong>飞书登录</strong>
+                    <small>使用飞书账号一键授权</small>
+                </button>
+            </div>
+
+            <p class="auth-toggle-hint">没有账号？<button type="button" class="link-button" data-goto="register">立即注册</button></p>
+
+            <div id="phonePasswordView" class="auth-view">
+                <button type="button" class="back-link" data-back="selector">← 返回选择</button>
+                <form id="phonePasswordForm" class="form-panel active">
+                    <label>
+                        <span>手机号</span>
+                        <input name="phone" type="tel" placeholder="请输入手机号" required>
+                    </label>
+                    <label>
+                        <span>密码</span>
+                        <input name="password" type="password" placeholder="请输入密码" required>
+                    </label>
+                    <div class="form-inline-action">
+                        <button type="button" id="forgotPasswordBtn" class="link-button">忘记密码</button>
+                    </div>
+                    <button type="submit" class="primary-button">登录</button>
+                </form>
+            </div>
+
+            <div id="emailCodeView" class="auth-view">
+                <button type="button" class="back-link" data-back="selector">← 返回选择</button>
+                <form id="emailCodeForm" class="form-panel active">
+                    <label>
+                        <span>邮箱</span>
+                        <input name="email" type="email" placeholder="请输入邮箱地址" required>
+                    </label>
+                    <div class="inline-field code-row">
+                        <label>
+                            <span>验证码</span>
+                            <input name="code" placeholder="请输入验证码" required>
+                        </label>
+                        <button type="button" id="sendEmailCodeBtn" class="secondary-button">发送验证码</button>
+                    </div>
+                    <button type="submit" class="primary-button">验证码登录</button>
+                </form>
+            </div>
+
+            <div id="registerView" class="auth-view">
+                <button type="button" class="back-link" data-back="selector">← 返回选择</button>
+                <form id="registerForm" class="form-panel active">
+                    <label>
+                        <span>账号</span>
+                        <input id="registerAccountInput" name="account" placeholder="请输入手机号或邮箱" required>
+                    </label>
+                    <label>
+                        <span>昵称</span>
+                        <input name="nickname" placeholder="请输入昵称" required>
+                    </label>
+                    <label>
+                        <span>密码</span>
+                        <input name="password" type="password" placeholder="设置登录密码" required>
+                    </label>
+                    <div class="inline-field code-row">
+                        <label>
+                            <span>验证码</span>
+                            <input name="code" placeholder="请输入验证码" required>
+                        </label>
+                        <button type="button" id="sendRegisterCodeBtn" class="secondary-button">发送验证码</button>
+                    </div>
+                    <button type="submit" class="primary-button">注册并登录</button>
+                </form>
+                <p class="auth-toggle-hint">已有账号？<button type="button" class="link-button" data-goto="login">返回登录</button></p>
+            </div>
+        </section>
+    </div>
+
+    <div id="consoleApp" class="console-app hidden">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <p class="eyebrow">Console</p>
+                <h2>Topbiz Admin</h2>
+            </div>
+            <nav id="sidebarMenu" class="sidebar-menu"></nav>
+            <div class="sidebar-footer">
+                <button id="logoutSidebarBtn" class="ghost-button full-width">退出登录</button>
+            </div>
+        </aside>
+
+        <div class="console-main">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">Workspace</p>
+                    <h1 id="pageTitle">工作台</h1>
+                </div>
+                <div class="topbar-right">
+                    <button id="messageDrawerBtn" class="secondary-button">站内消息</button>
+                    <button id="topbarSendMessageBtn" class="primary-button">发送消息</button>
+                    <button id="profileCenterBtn" class="secondary-button">个人中心</button>
+                    <div id="currentUserCard" class="user-chip">未登录</div>
+                    <button id="deviceDrawerBtn" class="secondary-button">设备会话</button>
+                </div>
+            </header>
+
+            <main class="content-shell">
+                <section id="page-dashboard" class="page active">
+                    <div class="stats-grid">
+                        <article class="stat-card">
+                            <span>当前账号</span>
+                            <strong id="statUserName">-</strong>
+                            <small id="statUserRole">-</small>
+                        </article>
+                        <article class="stat-card">
+                            <span>菜单数量</span>
+                            <strong id="statMenuCount">0</strong>
+                            <small>按权限动态生成</small>
+                        </article>
+                        <article class="stat-card">
+                            <span>所属分组</span>
+                            <strong id="statUserGroups">-</strong>
+                            <small>一个用户可属于多个分组</small>
+                        </article>
+                        <article class="stat-card">
+                            <span>会话状态</span>
+                            <strong>在线</strong>
+                            <small>通过 topbiz 统一接入</small>
+                        </article>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <section class="card panel-card">
+                            <div class="section-header">
+                                <div>
+                                    <p class="eyebrow">Quick Entry</p>
+                                    <h3>常用操作</h3>
+                                </div>
+                            </div>
+                            <div id="quickActions" class="quick-actions"></div>
+                        </section>
+
+                        <section class="card panel-card">
+                            <div class="section-header">
+                                <div>
+                                    <p class="eyebrow">Flow Engine</p>
+                                    <h3>注册流程预览</h3>
+                                </div>
+                                <button id="refreshFlowBtn" class="secondary-button">刷新流程</button>
+                            </div>
+                            <div id="flowOverview" class="flow-overview empty-state">加载中...</div>
+                        </section>
+
+                        <section class="card panel-card">
+                            <div class="section-header">
+                                <div>
+                                    <p class="eyebrow">Message Center</p>
+                                    <h3>最新消息</h3>
+                                </div>
+                                <div class="section-actions">
+                                    <button id="openDashboardMessagesBtn" class="secondary-button">打开消息中心</button>
+                                    <button id="dashboardSendMessageBtn" class="primary-button">发送消息</button>
+                                </div>
+                            </div>
+                            <div id="dashboardMessagePreview" class="empty-state">暂无站内消息</div>
+                        </section>
+                    </div>
+                </section>
+
+                <section id="page-users" class="page">
+                    <div class="card panel-card">
+                        <div class="section-header">
+                            <div>
+                                <p class="eyebrow">User Management</p>
+                                <h3>用户管理</h3>
+                            </div>
+                            <div class="section-actions">
+                                <input id="userKeyword" placeholder="搜索昵称/手机/邮箱">
+                                <button id="searchUsersBtn" class="secondary-button">查询</button>
+                                <button id="openCreateUserBtn" class="primary-button">新建用户</button>
+                            </div>
+                        </div>
+                        <div id="usersTable" class="table-wrap empty-state">暂无数据</div>
+                    </div>
+                </section>
+
+                <section id="page-groups" class="page">
+                    <div class="card panel-card">
+                        <div class="section-header">
+                            <div>
+                                <p class="eyebrow">Organization</p>
+                                <h3>组织管理</h3>
+                            </div>
+                            <div class="section-actions">
+                                <input id="groupKeyword" placeholder="搜索组织名称">
+                                <button id="searchGroupsBtn" class="secondary-button">查询</button>
+                                <button id="openCreateGroupBtn" class="primary-button">新建组织</button>
+                            </div>
+                        </div>
+                        <div id="groupsTable" class="table-wrap empty-state">暂无数据</div>
+                    </div>
+                </section>
+
+                <section id="page-permissions" class="page">
+                    <div class="card panel-card">
+                        <div class="section-header">
+                            <div>
+                                <p class="eyebrow">Permission Model</p>
+                                <h3>权限管理</h3>
+                            </div>
+                            <div class="section-actions">
+                                <input id="permissionKeyword" placeholder="搜索权限名称或编码">
+                                <button id="searchPermissionsBtn" class="secondary-button">查询</button>
+                                <button id="openCreatePermissionBtn" class="primary-button">新建权限</button>
+                            </div>
+                        </div>
+                        <div id="permissionsTree" class="tree-wrap empty-state">暂无数据</div>
+                    </div>
+                </section>
+
+                <section id="page-flow" class="page">
+                    <div class="two-column-grid">
+                        <section class="card panel-card">
+                            <div class="section-header">
+                                <div>
+                                    <p class="eyebrow">Flow Preview</p>
+                                    <h3>注册流程节点视图</h3>
+                                </div>
+                            </div>
+                            <div id="flowCanvas" class="flow-canvas empty-state">加载中...</div>
+                        </section>
+
+                        <section class="card panel-card">
+                            <div class="section-header">
+                                <div>
+                                    <p class="eyebrow">Flow Draft</p>
+                                    <h3>register-default.yml</h3>
+                                </div>
+                                <div class="section-actions">
+                                    <button id="prettyFlowBtn" class="secondary-button">整理草稿</button>
+                                    <button id="copyFlowBtn" class="secondary-button">复制</button>
+                                </div>
+                            </div>
+                            <textarea id="flowEditor" class="flow-editor"></textarea>
+                        </section>
+                    </div>
+                </section>
+
+                <section id="page-notifications" class="page">
+                    <div class="card panel-card">
+                        <div class="section-header">
+                            <div>
+                                <p class="eyebrow">Notification Ops</p>
+                                <h3>通知管理</h3>
+                            </div>
+                            <div class="section-actions">
+                                <button class="message-filter active" data-notification-tab="channels">通道</button>
+                                <button class="message-filter" data-notification-tab="templates">模板</button>
+                                <button class="message-filter" data-notification-tab="messages">记录</button>
+                                <button class="message-filter" data-notification-tab="policies">策略</button>
+                            </div>
+                        </div>
+
+                        <div id="notificationChannelsPane" class="notification-pane active">
+                            <div class="section-header compact-section-header">
+                                <div>
+                                    <strong>载体配置</strong>
+                                    <div class="subtle">配置 email、sms、push、in_app 等发送通道，并选择默认 carrier。</div>
+                                </div>
+                                <div class="section-actions">
+                                    <button id="refreshChannelsBtn" class="secondary-button">刷新通道</button>
+                                    <button id="openCreateChannelBtn" class="primary-button">新增通道配置</button>
+                                </div>
+                            </div>
+                            <div id="channelsTable" class="table-wrap empty-state">暂无通道配置</div>
+                        </div>
+
+                        <div id="notificationTemplatesPane" class="notification-pane">
+                            <div class="section-header compact-section-header">
+                                <div class="section-actions">
+                                    <input id="templateBusinessFilter" placeholder="业务编码">
+                                    <select id="templateChannelFilter">
+                                        <option value="">全部通道</option>
+                                        <option value="in_app">站内</option>
+                                        <option value="email">邮件</option>
+                                        <option value="push">推送</option>
+                                    </select>
+                                    <select id="templateStatusFilter">
+                                        <option value="">全部状态</option>
+                                        <option value="draft">草稿</option>
+                                        <option value="active">启用</option>
+                                        <option value="archived">归档</option>
+                                    </select>
+                                    <button id="searchTemplatesBtn" class="secondary-button">查询模板</button>
+                                </div>
+                                <button id="openCreateTemplateBtn" class="primary-button">新建模板</button>
+                            </div>
+                            <div id="templatesTable" class="table-wrap empty-state">暂无模板</div>
+                        </div>
+
+                        <div id="notificationMessagesPane" class="notification-pane">
+                            <div class="section-header compact-section-header">
+                                <div class="section-actions">
+                                    <input id="messageBusinessFilter" placeholder="业务编码">
+                                    <select id="messageStatusFilter">
+                                        <option value="">全部状态</option>
+                                        <option value="pending">待发送</option>
+                                        <option value="sent">已发送</option>
+                                        <option value="failed">失败</option>
+                                        <option value="retrying">重试中</option>
+                                        <option value="canceled">已取消</option>
+                                    </select>
+                                    <input id="messageRecipientFilter" placeholder="接收人">
+                                    <button id="searchReusableMessagesBtn" class="secondary-button">查询记录</button>
+                                </div>
+                                <button id="openReusableSendBtn" class="primary-button">发送通知</button>
+                            </div>
+                            <div id="reusableMessagesTable" class="table-wrap empty-state">暂无发送记录</div>
+                        </div>
+
+                        <div id="notificationPoliciesPane" class="notification-pane">
+                            <div class="section-header compact-section-header">
+                                <div class="section-actions">
+                                    <input id="policyBusinessFilter" placeholder="业务编码">
+                                    <select id="policyChannelFilter">
+                                        <option value="">全部通道</option>
+                                        <option value="in_app">站内</option>
+                                        <option value="email">邮件</option>
+                                        <option value="push">推送</option>
+                                    </select>
+                                    <select id="policyStatusFilter">
+                                        <option value="">全部状态</option>
+                                        <option value="active">启用</option>
+                                        <option value="disabled">停用</option>
+                                        <option value="draft">草稿</option>
+                                    </select>
+                                    <button id="searchPoliciesBtn" class="secondary-button">查询策略</button>
+                                </div>
+                                <button id="openCreatePolicyBtn" class="primary-button">新建策略</button>
+                            </div>
+                            <div id="policiesTable" class="table-wrap empty-state">暂无策略</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="page-logs" class="page">
+                    <div class="card panel-card">
+                        <div class="section-header">
+                            <div>
+                                <p class="eyebrow">Log Ops</p>
+                                <h3>日志运维</h3>
+                            </div>
+                            <div class="section-actions">
+                                <button class="message-filter active" data-log-tab="query">访问日志</button>
+                                <button class="message-filter" data-log-tab="metrics">指标分析</button>
+                                <button class="message-filter" data-log-tab="alerts">告警规则</button>
+                                <button class="message-filter" data-log-tab="triggers">触发记录</button>
+                            </div>
+                        </div>
+
+                        <div id="logQueryPane" class="notification-pane log-pane active">
+                            <div class="log-filter-grid">
+                                <label><span>开始时间</span><input id="logStartInput" type="datetime-local"></label>
+                                <label><span>结束时间</span><input id="logEndInput" type="datetime-local"></label>
+                                <label><span>服务</span><input id="logServiceInput" placeholder="topbiz"></label>
+                                <label><span>接口</span><input id="logApiInput" placeholder="/api/v1/..."></label>
+                                <label><span>方法</span><select id="logMethodInput"><option value="">全部</option><option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option></select></label>
+                                <label><span>状态码</span><input id="logStatusInput" type="number" min="100" max="599" placeholder="500"></label>
+                                <label><span>Client IP</span><input id="logClientIpInput"></label>
+                                <label><span>Trace ID</span><input id="logTraceIdInput"></label>
+                                <label><span>User ID</span><input id="logUserIdInput"></label>
+                                <label><span>Page Size</span><input id="logPageSizeInput" type="number" min="1" max="200" value="50"></label>
+                            </div>
+                            <div class="section-actions log-actions">
+                                <button id="searchLogsBtn" class="primary-button">查询日志</button>
+                            </div>
+                            <div id="logsTable" class="table-wrap empty-state">暂无访问日志</div>
+                        </div>
+
+                        <div id="logMetricsPane" class="notification-pane log-pane">
+                            <div class="log-filter-grid">
+                                <label><span>指标</span><select id="logMetricTypeInput">
+                                    <option value="request_rate">请求 QPS</option>
+                                    <option value="request_timeout_rate">超时率</option>
+                                    <option value="request_error_rate">错误率</option>
+                                    <option value="request_latency">请求延迟</option>
+                                    <option value="downstream_error_rate">下游错误率</option>
+                                    <option value="downstream_latency">下游延迟</option>
+                                    <option value="ip_request_rate">IP 请求 QPS</option>
+                                    <option value="user_request_rate">用户请求 QPS</option>
+                                </select></label>
+                                <label><span>开始时间</span><input id="metricStartInput" type="datetime-local"></label>
+                                <label><span>结束时间</span><input id="metricEndInput" type="datetime-local"></label>
+                                <label><span>窗口</span><input id="metricWindowInput" value="1m" placeholder="1m"></label>
+                                <label><span>服务</span><input id="metricServiceInput" placeholder="topbiz"></label>
+                                <label><span>接口</span><input id="metricApiInput" placeholder="/api/v1/..."></label>
+                                <label><span>下游服务</span><input id="metricDownstreamInput" placeholder="user-service"></label>
+                                <label><span>错误类型</span><select id="metricErrorTypeInput"><option value="">默认</option><option value="5xx">5xx</option><option value="timeout">timeout</option><option value="connection_failure">connection_failure</option></select></label>
+                                <label><span>分位数</span><select id="metricPercentileInput"><option value="">默认 P99</option><option value="p50">P50</option><option value="p95">P95</option><option value="p99">P99</option></select></label>
+                                <label><span>Client IP</span><input id="metricClientIpInput"></label>
+                                <label><span>User ID</span><input id="metricUserIdInput"></label>
+                                <label><span>Min QPS</span><input id="metricMinQpsInput" type="number" step="0.01"></label>
+                                <label><span>超时阈值 ms</span><input id="metricTimeoutInput" type="number" min="1" placeholder="3000"></label>
+                            </div>
+                            <div class="section-actions log-actions">
+                                <button id="loadMetricBtn" class="primary-button">查询指标</button>
+                            </div>
+                            <div id="logMetricSummary" class="log-summary"></div>
+                            <div id="logMetricChartPanel" class="metric-chart-panel">
+                                <div class="metric-chart-head">
+                                    <div>
+                                        <strong id="logMetricChartTitle">指标趋势</strong>
+                                        <span id="logMetricChartMeta">-</span>
+                                    </div>
+                                    <div id="logMetricChartLegend" class="metric-chart-legend"></div>
+                                </div>
+                                <div class="metric-chart-stage">
+                                    <canvas id="logMetricChart" aria-label="指标趋势图"></canvas>
+                                    <div id="logMetricChartEmpty" class="metric-chart-empty">暂无指标数据</div>
+                                    <div id="logMetricChartTooltip" class="metric-chart-tooltip hidden"></div>
+                                </div>
+                            </div>
+                            <div id="logMetricsTable" class="table-wrap empty-state">暂无指标数据</div>
+                        </div>
+
+                        <div id="logAlertsPane" class="notification-pane log-pane">
+                            <div class="section-header compact-section-header">
+                                <div class="section-actions">
+                                    <select id="alertMetricFilter">
+                                        <option value="">全部指标</option>
+                                        <option value="request_rate">request_rate</option>
+                                        <option value="request_timeout_rate">request_timeout_rate</option>
+                                        <option value="request_error_rate">request_error_rate</option>
+                                        <option value="request_latency">request_latency</option>
+                                        <option value="downstream_error_rate">downstream_error_rate</option>
+                                        <option value="downstream_latency">downstream_latency</option>
+                                        <option value="ip_request_rate">ip_request_rate</option>
+                                        <option value="user_request_rate">user_request_rate</option>
+                                    </select>
+                                    <input id="alertServiceFilter" placeholder="服务">
+                                    <select id="alertEnabledFilter">
+                                        <option value="">全部状态</option>
+                                        <option value="true">启用</option>
+                                        <option value="false">停用</option>
+                                    </select>
+                                    <button id="searchAlertRulesBtn" class="secondary-button">查询规则</button>
+                                </div>
+                                <button id="openCreateAlertRuleBtn" class="primary-button">新增规则</button>
+                            </div>
+                            <div id="alertRulesTable" class="table-wrap empty-state">暂无告警规则</div>
+                        </div>
+
+                        <div id="logTriggersPane" class="notification-pane log-pane">
+                            <div class="section-header compact-section-header">
+                                <div class="section-actions">
+                                    <input id="triggerRuleFilter" placeholder="Rule ID">
+                                    <select id="triggerMetricFilter">
+                                        <option value="">全部指标</option>
+                                        <option value="request_rate">request_rate</option>
+                                        <option value="request_timeout_rate">request_timeout_rate</option>
+                                        <option value="request_error_rate">request_error_rate</option>
+                                        <option value="request_latency">request_latency</option>
+                                        <option value="downstream_error_rate">downstream_error_rate</option>
+                                        <option value="downstream_latency">downstream_latency</option>
+                                        <option value="ip_request_rate">ip_request_rate</option>
+                                        <option value="user_request_rate">user_request_rate</option>
+                                    </select>
+                                    <button id="searchAlertTriggersBtn" class="secondary-button">查询触发</button>
+                                </div>
+                            </div>
+                            <div id="alertTriggersTable" class="table-wrap empty-state">暂无触发记录</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="page-response" class="page hidden">
+                    <div class="card panel-card">
+                        <pre id="responseBox" class="response-box"></pre>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div id="deviceDrawer" class="drawer hidden">
+        <div class="drawer-panel">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Session Devices</p>
+                    <h3>登录设备</h3>
+                </div>
+                <button id="closeDeviceDrawerBtn" class="ghost-button">关闭</button>
+            </div>
+            <div id="devicesList" class="empty-state">暂无设备会话</div>
+        </div>
+    </div>
+
+    <div id="messageDrawer" class="drawer hidden">
+        <div class="drawer-panel">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Message Center</p>
+                    <h3>站内消息</h3>
+                </div>
+                <button id="closeMessageDrawerBtn" class="ghost-button">关闭</button>
+            </div>
+            <div class="section-actions">
+                <button id="refreshMessagesBtn" class="secondary-button">刷新</button>
+                <button id="markAllMessagesReadBtn" class="secondary-button">全部已读</button>
+                <button id="openSendMessageBtn" class="primary-button">发送消息</button>
+            </div>
+            <div id="messageSummaryBar" class="message-summary-grid"></div>
+            <div class="message-filter-bar">
+                <button class="message-filter active" data-message-filter="all">全部</button>
+                <button class="message-filter" data-message-filter="unread">未读</button>
+                <button class="message-filter" data-message-filter="read">已读</button>
+            </div>
+            <div id="messagesList" class="empty-state">暂无站内消息</div>
+            <div id="messagesPagination" class="message-pagination hidden"></div>
+        </div>
+    </div>
+
+    <div id="modalRoot" class="modal-root hidden"></div>
+    <script src="./app.js?v=20260628i"></script>
+</body>
+</html>
